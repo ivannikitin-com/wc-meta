@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"window.autoDetectColorScheme": true,
+		"workbench.iconTheme": "vs-seti",
+		"workbench.preferredHighContrastLightColorTheme": "Cursor Dark",
+		"workbench.preferredDarkColorTheme": "Cursor Dark",
+		"workbench.preferredLightColorTheme": "Cursor Dark"
+	}
+}
