@@ -14,13 +14,36 @@ class WC_Meta_ThankYou extends WC_Meta_Page {
         if (!function_exists('wc_get_order')) {
             return;
         }
-        // Используем order-received, если есть, иначе order
-        $order_id = isset($_GET['order-received']) ? intval($_GET['order-received']) : (isset($_GET['order']) ? intval($_GET['order']) : 0);
+        
+        // Получаем order_id
+        $order_id = get_query_var('order-received');
+        \WP_DEBUG && error_log('WC_Meta_ThankYou: order_id get_query_var: #' . $order_id);
+        
+        // Сначала пробуем получить из параметров (для обратной совместимости)
+        if ( !$order_id && isset($_GET['order-received'])) {
+            $order_id = intval($_GET['order-received']);
+        } elseif ( !$order_id && isset($_GET['order'])) {
+            $order_id = intval($_GET['order']);
+        }
+        
+        // Если не получили из параметров, извлекаем из URL
         if (!$order_id) {
+            $current_url = $_SERVER['REQUEST_URI'] ?? '';
+            // Регулярное выражение для извлечения номера заказа из URL
+            // Паттерн: /checkout/order-received/ЧИСЛО/
+            if (preg_match('/\/checkout\/order-received\/(\d+)/', $current_url, $matches)) {
+                $order_id = intval($matches[1]);
+            }
+        }
+        
+        if (!$order_id) {
+            \WP_DEBUG && error_log('WC_Meta_ThankYou: order_id not found');
             return;
         }
+        
         $order = wc_get_order($order_id);
         if (!$order) {
+            \WP_DEBUG && error_log('WC_Meta_ThankYou: order #' . $order_id . ' not found');
             return;
         }
         $status = $order->get_status();
@@ -32,4 +55,4 @@ class WC_Meta_ThankYou extends WC_Meta_Page {
             echo '<meta name="wc-customer-id" content="' . esc_attr($customer_id) . '" />';
         }
     }
-} 
+}
