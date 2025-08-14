@@ -20,13 +20,14 @@
  *
  * Requires Plugins: woocommerce
  *
- * Version:     1.0
+ * Version:     1.1.0
  */
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 // Файлы плагина
 require_once __DIR__ . '/includes/class-wc-meta-page.php';
 require_once __DIR__ . '/includes/class-wc-meta-thankyou.php';
+require_once __DIR__ . '/includes/class-wc-js-cart-funcs.php';
 require_once __DIR__ . '/includes/class-plugin.php';
 
 // Запуск плагина

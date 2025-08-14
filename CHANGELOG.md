@@ -5,6 +5,38 @@
 Формат основан на [Keep a Changelog](https://keepachangelog.com/ru/1.0.0/),
 и этот проект придерживается [Semantic Versioning](https://semver.org/lang/ru/).
 
+## [v1.1.0] - 2025-01-14
+
+### Added
+
+- **Новый класс WC_JS_Cart_Funcs** для реализации JavaScript функций работы с корзиной WooCommerce
+- **Глобальный объект `window.digiLayer`** с тремя основными методами:
+  - `addToCart(productId, quantity)` - добавление товара в корзину
+  - `removeFromCart(productId)` - удаление товара из корзины
+  - `cartState()` - получение текущего состояния корзины
+- **AJAX обработчики** для всех операций с корзиной:
+  - `wp_ajax_add_to_cart` и `wp_ajax_nopriv_add_to_cart`
+  - `wp_ajax_remove_from_cart` и `wp_ajax_nopriv_remove_from_cart`
+  - `wp_ajax_get_cart_state` и `wp_ajax_nopriv_get_cart_state`
+- **Режим отладки** с условным логированием (только при `WP_DEBUG = true`)
+- **JavaScript файл** `assets/js/cart-funcs.js` с полной реализацией функций
+- **Тестовый HTML файл** `test-cart-functions.html` для демонстрации работы
+- **Обновленная документация** с примерами использования и отладочной информацией
+
+### Changed
+
+- Обновлен основной файл плагина для подключения нового класса
+- Расширена архитектура плагина для поддержки JavaScript функциональности
+- Обновлен README.md с подробным описанием новых возможностей
+
+### Technical
+
+- Все JavaScript функции возвращают Promise для асинхронной работы
+- Реализована безопасность через WordPress nonce
+- Добавлена валидация входных данных на стороне сервера
+- Интеграция с WooCommerce API для работы с корзиной
+- Поддержка как авторизованных, так и неавторизованных пользователей
+
 ## [v1.0.1]
 
 ### Added

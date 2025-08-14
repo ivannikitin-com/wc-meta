@@ -16,6 +16,9 @@ class Plugin {
         $this->handlers[] = new WC_Meta_ThankYou();
         add_action('wp_head', [$this, 'handle']);
         add_action( 'init', [ $this, 'init' ] );
+        
+        // Инициализируем JavaScript функции корзины
+        new WC_JS_Cart_Funcs();
     }
 
     // Инициализация компонентов плагина и хуки

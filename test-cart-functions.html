@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест функций корзины WC Meta</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #fafafa;
+        }
+        
+        .test-section h3 {
+            margin-top: 0;
+            color: #555;
+        }
+        
+        input[type="number"] {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-right: 10px;
+            width: 100px;
+        }
+        
+        button {
+            padding: 8px 16px;
+            background-color: #0073aa;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        
+        button:hover {
+            background-color: #005a87;
+        }
+        
+        button.danger {
+            background-color: #dc3232;
+        }
+        
+        button.danger:hover {
+            background-color: #a00;
+        }
+        
+        .result {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        
+        .result.success {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        
+        .result.error {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        
+        .result.info {
+            background-color: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+        
+        .console-output {
+            background-color: #2d3748;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Тест функций корзины WC Meta</h1>
+
+        <div class="test-section">
+            <h3>Добавление товара в корзину</h3>
+            <p>ID товара: <input type="number" id="addProductId" value="32761" min="1"></p>
+            <p>Количество: <input type="number" id="addQuantity" value="1" min="1"></p>
+            <button onclick="testAddToCart()">Добавить в корзину</button>
+            <div id="addResult" class="result" style="display: none;"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>Удаление товара из корзины</h3>
+            <p>ID товара: <input type="number" id="removeProductId" value="32761" min="1"></p>
+            <button onclick="testRemoveFromCart()" class="danger">Удалить из корзины</button>
+            <div id="removeResult" class="result" style="display: none;"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>Проверка состояния корзины</h3>
+            <button onclick="testCartState()">Получить состояние корзины</button>
+            <div id="stateResult" class="result" style="display: none;"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>Быстрые тесты (как в примере)</h3>
+            <button onclick="runQuickTests()">Запустить быстрые тесты</button>
+            <div id="quickResult" class="result" style="display: none;"></div>
+        </div>
+
+        <div class="console-output" id="consoleOutput">
+            <div>Консоль вывода:</div>
+            <div id="consoleContent"></div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        // Имитация AJAX для демонстрации
+        window.wcCartAjax = {
+            ajaxurl: 'demo-ajax.php',
+            nonce: 'demo-nonce',
+            debug: true // Включаем режим отладки для демонстрации
+        };
+
+        // Демонстрационная реализация функций
+        if (typeof window.digiLayer === 'undefined') {
+            window.digiLayer = {};
+        }
+
+        // Имитация addToCart
+        window.digiLayer.addToCart = function(productId, quantity = 1) {
+            return new Promise(function(resolve, reject) {
+                console.log(`Добавление товара ${productId} в количестве ${quantity}`);
+                setTimeout(() => {
+                    resolve({
+                        message: 'Товар добавлен в корзину',
+                        cart_item_key: 'demo_key_' + productId
+                    });
+                }, 500);
+            });
+        };
+
+        // Имитация removeFromCart
+        window.digiLayer.removeFromCart = function(productId) {
+            return new Promise(function(resolve, reject) {
+                console.log(`Удаление товара ${productId}`);
+                setTimeout(() => {
+                    resolve({
+                        message: 'Товар удален из корзины'
+                    });
+                }, 500);
+            });
+        };
+
+        // Имитация cartState
+        window.digiLayer.cartState = function() {
+            return new Promise(function(resolve, reject) {
+                console.log('Получение состояния корзины');
+                setTimeout(() => {
+                    // Имитируем состояние корзины
+                    const cartState = {};
+                    if (Math.random() > 0.5) {
+                        cartState[32761] = 1;
+                    }
+                    resolve(cartState);
+                }, 300);
+            });
+        };
+
+        // Функции тестирования
+        function logToConsole(message, type = 'info') {
+            const consoleContent = document.getElementById('consoleContent');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.style.color = type === 'error' ? '#ff6b6b' : type === 'success' ? '#51cf66' : '#74c0fc';
+            logEntry.textContent = `[${timestamp}] ${message}`;
+            consoleContent.appendChild(logEntry);
+            consoleContent.scrollTop = consoleContent.scrollHeight;
+        }
+
+        function showResult(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.className = `result ${type}`;
+            element.style.display = 'block';
+        }
+
+        async function testAddToCart() {
+            const productId = parseInt(document.getElementById('addProductId').value);
+            const quantity = parseInt(document.getElementById('addQuantity').value);
+
+            try {
+                logToConsole(`> window.digiLayer.addToCart(${productId}, ${quantity})`);
+                const result = await window.digiLayer.addToCart(productId, quantity);
+                logToConsole(`< ${JSON.stringify(result)}`, 'success');
+                showResult('addResult', JSON.stringify(result, null, 2), 'success');
+            } catch (error) {
+                logToConsole(`< Error: ${error.message}`, 'error');
+                showResult('addResult', `Ошибка: ${error.message}`, 'error');
+            }
+        }
+
+        async function testRemoveFromCart() {
+            const productId = parseInt(document.getElementById('removeProductId').value);
+
+            try {
+                logToConsole(`> window.digiLayer.removeFromCart(${productId})`);
+                const result = await window.digiLayer.removeFromCart(productId);
+                logToConsole(`< ${JSON.stringify(result)}`, 'success');
+                showResult('removeResult', JSON.stringify(result, null, 2), 'success');
+            } catch (error) {
+                logToConsole(`< Error: ${error.message}`, 'error');
+                showResult('removeResult', `Ошибка: ${error.message}`, 'error');
+            }
+        }
+
+        async function testCartState() {
+            try {
+                logToConsole(`> window.digiLayer.cartState()`);
+                const result = await window.digiLayer.cartState();
+                logToConsole(`< ${JSON.stringify(result)}`, 'success');
+                showResult('stateResult', JSON.stringify(result, null, 2), 'success');
+            } catch (error) {
+                logToConsole(`< Error: ${error.message}`, 'error');
+                showResult('stateResult', `Ошибка: ${error.message}`, 'error');
+            }
+        }
+
+        async function runQuickTests() {
+            logToConsole('Запуск быстрых тестов...', 'info');
+
+            try {
+                // Тест 1: Добавление товара
+                logToConsole(`> window.digiLayer.addToCart(32761)`);
+                const addResult = await window.digiLayer.addToCart(32761);
+                logToConsole(`< Promise {<pending>}`, 'info');
+
+                // Тест 2: Проверка состояния
+                logToConsole(`> window.digiLayer.cartState()`);
+                const stateResult = await window.digiLayer.cartState();
+                logToConsole(`► ${JSON.stringify(stateResult)}`, 'success');
+
+                // Тест 3: Удаление товара
+                logToConsole(`> window.digiLayer.removeFromCart(32761)`);
+                const removeResult = await window.digiLayer.removeFromCart(32761);
+                logToConsole(`< Promise {<pending>}`, 'info');
+
+                // Тест 4: Проверка состояния после удаления
+                logToConsole(`> window.digiLayer.cartState()`);
+                const finalState = await window.digiLayer.cartState();
+                logToConsole(`< ${JSON.stringify(finalState)}`, 'success');
+
+                showResult('quickResult', 'Быстрые тесты выполнены успешно!', 'success');
+            } catch (error) {
+                logToConsole(`Ошибка в быстрых тестах: ${error.message}`, 'error');
+                showResult('quickResult', `Ошибка: ${error.message}`, 'error');
+            }
+        }
+
+        // Инициализация
+        document.addEventListener('DOMContentLoaded', function() {
+            logToConsole('WC Cart Functions initialized. Available methods:', 'info');
+            logToConsole('- window.digiLayer.addToCart(productId, quantity)', 'info');
+            logToConsole('- window.digiLayer.removeFromCart(productId)', 'info');
+            logToConsole('- window.digiLayer.cartState()', 'info');
+        });
+    </script>
+</body>
+
+</html>
